@@ -1,34 +1,4 @@
-// const express=require('express');
-// const cors=require('cors');
-// const app=express();
-// const config=require('./DBConfig/Config');
-// const port=4000;
 
-// app.use(cors());
-// app.use(express.json());
-
-// config();
-
-
-// app.get('/',async(req,res)=>{
-//     try{
-// res.json({success:true,message:"api is working"})
-//     }catch(error){
-
-//     }
-// })
-// app.post('/api/login',async(req,res)=>{
-//     try{
-
-//     }catch{
-
-//     }
-// })
-
-
-// app.listen(port,()=>{
-//     console.log(`Server is running on http://localhost:${port}`);
-// })
 
 
 
@@ -56,19 +26,82 @@ app.get('/', async (req, res) => {
   }
 });
 
-// Login route (Sign In / Sign Out)
-app.post('/api/login', async (req, res) => {
-  const { action, username, timestamp } = req.body;
-console.log("action : ",action," username : ", username," timestamp : ", timestamp );
+// // PATCH route to update login action (Sign In / Sign Out)
+// app.patch('/api/login', async (req, res) => {
+//   const { username, action, timestamp } = req.body;
+
+//   try {
+//     // Validate action
+//     if (!['Sign In', 'Sign Out'].includes(action)) {
+//       return res.status(400).json({ error: 'Invalid action. Use "Sign In" or "Sign Out".' });
+//     }
+
+//     // Find the user by username
+//     const user = await User.findOne({ username });
+//     if (!user) {
+//       return res.status(400).json({ error: 'User not found' });
+//     }
+
+//     // Get the last action and check if it's already the same as the new action
+//     const lastAction = user.cart[user.cart.length - 1];
+//     if (lastAction && lastAction.action === action) {
+//       return res.status(400).json({ error: 'Action is already the same' });
+//     }
+
+//     // Add action to user's login history (cart)
+//     user.cart.push({ action, timestamp: new Date(timestamp) });
+//     await user.save();
+
+//     res.status(200).json({ message: 'Action logged successfully' });
+//   } catch (error) {
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+// Endpoint to get current login status
+app.get('/api/login-status', async (req, res) => {
+  const { username } = req.query;
 
   try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const lastLogin = user.cart[user.cart.length - 1]; // Get the last login action
+    const status = lastLogin ? lastLogin.action : 'Sign Out'; // Default to 'Sign Out' if no history exists
+
+    res.status(200).json({ success: true, status });
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching login status' });
+  }
+});
+
+
+// PATCH route to update login action (Sign In / Sign Out)
+app.patch('/api/login', async (req, res) => {
+  const { username, action, timestamp } = req.body;
+console.log("username : ",username," action : ",action," timestamp : ",timestamp );
+
+  try {
+    // Validate action
+    if (!['Sign In', 'Sign Out'].includes(action)) {
+      return res.status(400).json({ error: 'Invalid action. Use "Sign In" or "Sign Out".' });
+    }
+
     // Find the user by username
     const user = await User.findOne({ username });
     if (!user) {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    // Add action to user's cart (login/logout history)
+    // Get the last action and check if it's already the same as the new action
+    const lastAction = user.cart[user.cart.length - 1];
+    if (lastAction && lastAction.action === action) {
+      return res.status(400).json({ error: 'Action is already the same' });
+    }
+
+    // Add action to user's login history (cart)
     user.cart.push({ action, timestamp: new Date(timestamp) });
     await user.save();
 
@@ -77,6 +110,7 @@ console.log("action : ",action," username : ", username," timestamp : ", timesta
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Get login history for a user
 app.get('/api/login-history', async (req, res) => {
@@ -95,6 +129,28 @@ app.get('/api/login-history', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// GET route to fetch the current login status of a user
+app.get('/api/current-login-status', async (req, res) => {
+  const { username } = req.query;
+
+  try {
+    // Find the user by username
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ error: 'User not found' });
+    }
+
+    // Get the last action from the cart (login history)
+    const lastAction = user.cart[user.cart.length - 1];
+    const status = lastAction ? lastAction.action : 'Sign Out'; // Default to 'Sign Out' if no history
+
+    res.status(200).json({ status });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Start server
 app.listen(port, () => {
