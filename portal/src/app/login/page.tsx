@@ -38,7 +38,7 @@ export default function LoginPage() {
             updateUserDetails(response.data.user); 
             
             // Redirect based on user role
-            const redirectPath ='/profile';
+            const redirectPath ='/components/Attentance';
             // const redirectPath = user.role === 'admin' ? '/Admin/Dashboard' : '/Dashboard/Filter';
             router.push(redirectPath);
         } catch (error) {
