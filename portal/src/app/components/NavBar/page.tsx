@@ -4,19 +4,23 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useAppContext } from "@/app/Context";
 
 export default function ProfilePage() {
   const router = useRouter();
 
   // State to store user data
   const [user, setUser] = useState(null);
+const {updateUserDetails,userName}=useAppContext();
+console.log(userName);
 
   // Logout function
   const logout = async () => {
     try {
       await axios.get("/api/users/logout");
       toast.success("Logout Successful");
-      setUser(null); // Clear user data on logout
+      setUser(null); 
+      updateUserDetails();
       router.push("/login");
     } catch (error) {
       console.error(error.message);
@@ -59,9 +63,9 @@ export default function ProfilePage() {
 
             {/* Conditionally render the username or login button */}
             <div className="flex items-center space-x-4">
-              {user ? (
+              {userName ? (
                 <>
-                  <span className="text-white">{user.username}</span> {/* Display user name */}
+                  <span className="text-white">{userName}</span> {/* Display user name */}
                   <button
                     onClick={logout}
                     className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"

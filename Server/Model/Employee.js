@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Sign In', 'Sign Out'],
         required: true,
+        default:"Sign Out"
       },
       timestamp: {
         type: Date,

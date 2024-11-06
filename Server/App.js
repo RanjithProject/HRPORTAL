@@ -59,6 +59,7 @@ app.get('/', async (req, res) => {
 // Login route (Sign In / Sign Out)
 app.post('/api/login', async (req, res) => {
   const { action, username, timestamp } = req.body;
+console.log("action : ",action," username : ", username," timestamp : ", timestamp );
 
   try {
     // Find the user by username

@@ -1,19 +1,20 @@
-
-
 'use client';
 import { useAppContext } from '@/app/Context';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 
 const Attendance = () => {
-  const { userName } = useAppContext(); // Assuming userName comes from context or similar state
+  const { userName } = useAppContext();
+ 
+  
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [loginOut, setLoginOut] = useState('Sign In');
+  const [loginOut, setLoginOut] = useState('Sign Out');
   const [loginHistory, setLoginHistory] = useState([]);
 
   // Toggle between Sign In and Sign Out
   const toggleLoginState = async () => {
-    const newState = loginOut === 'Sign In' ? 'Sign Out' : 'Sign In';
+    const newState = loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out';
+    // const val=newState!="Sign In"?"Sign In":"Sign Out";
     setLoginOut(newState);
 
     // Send the action to the backend (Sign In or Sign Out)
@@ -97,9 +98,9 @@ const Attendance = () => {
         <button
           onClick={toggleLoginState}
           className={`text-white px-4 py-2 rounded-lg 
-            ${loginOut === 'Sign In' ? 'bg-green-500 hover:bg-green-700' : 'bg-red-500 hover:bg-red-700'}`}
+            ${loginOut === 'Sign In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
         >
-          {loginOut}
+          {loginOut=='Sign In'?"Sign Out":"Sign In"}
         </button>
       </div>
 
