@@ -118,3 +118,179 @@ const Calendar = () => {
 export default Calendar;
 
 
+
+
+// 'use client';
+// import React, { useState } from 'react'
+// import "../app/page.css"
+
+// const daysOfWeek=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+// const months = [
+//   "January", "February", "March", "April", "May", "June",
+//   "July", "August", "September", "October", "November", "December"
+// ];
+
+// export default function Calendar() {
+
+//   const [selectedDate,setSelectedDate]=useState(new Date());
+
+//   const daysInMonth=()=>{
+//     const daysArray=[];
+//     const firstDay=new Date(selectedDate.getFullYear(),selectedDate.getMonth(),1);
+//     const lastDay=new Date(selectedDate.getFullYear(),selectedDate.getMonth()+1,0);
+
+//     console.log(firstDay);
+//     console.log(lastDay);
+    
+//     for(let i=0;i<=firstDay.getDay();i++){
+//       daysArray.push(null);
+//     }
+
+//     for(let i=0;i<=lastDay.getDay();i++){
+//       daysArray.push(new Date(selectedDate.getFullYear(),selectedDate.getMonth(),i));
+//     }
+
+//     return daysArray;
+//   }
+
+ 
+
+//   daysInMonth();
+
+//   return (
+//     <div className='calendar'>
+//       <div className="header">
+//         <button> &lt;</button>
+//         <select value={selectedDate.getMonth()}>
+//           {months.map((month,i)=>(
+//             <option value={i} key={i}>{month}</option>
+//           ))}
+//         </select>
+
+//         <select value={selectedDate.getFullYear()}>
+//           {
+//             Array.from({length:10},(_,i)=>selectedDate.getFullYear()-5+i)
+//             .map((year)=>(
+//               <option value={year} key={year}>{year}</option>
+//             ))
+//           }
+//         </select>
+//         <button> &gt;</button>
+//         </div>
+
+//         <div className="daysofweek">
+// {
+//   daysOfWeek.map((day)=>(
+//     <div key={day} className="">{day}</div>
+//   ))
+// }
+//         </div>
+//      <div className="">
+//       {daysInMonth().map((day,index)=>(
+//         <div className="" key={index}>
+//           {day?day.getDate():""}
+//         </div>
+//       ))}
+//      </div>
+//     </div>
+//   )
+// }
+
+
+
+// 'use client';
+// import React, { useState } from 'react';
+
+// const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// const months = [
+//   "January", "February", "March", "April", "May", "June",
+//   "July", "August", "September", "October", "November", "December"
+// ];
+
+// export default function Calendar() {
+//   const [selectedDate, setSelectedDate] = useState(new Date());
+
+//   const daysInMonth = () => {
+//     const daysArray = [];
+//     const firstDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+//     const lastDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+
+//     // Fill in empty slots before the first day of the month
+//     for (let i = 0; i < firstDay.getDay(); i++) {
+//       daysArray.push(null);
+//     }
+
+//     // Fill in the days of the month
+//     for (let i = 1; i <= lastDay.getDate(); i++) {
+//       daysArray.push(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), i));
+//     }
+
+//     return daysArray;
+//   };
+
+//   // Change the month
+//   const changeMonth = (increment) => {
+//     const newDate = new Date(selectedDate);
+//     newDate.setMonth(selectedDate.getMonth() + increment);
+//     setSelectedDate(newDate);
+//   };
+
+//   return (
+//     <div className="calendar p-4 bg-white shadow-lg rounded-lg">
+//       {/* Header: Month and Year Selector */}
+//       <div className="header flex justify-between items-center mb-4">
+//         <button
+//           className="p-2 bg-gray-200 rounded hover:bg-gray-300 text-black"
+//           onClick={() => changeMonth(-1)}
+//         >
+//           &lt;
+//         </button>
+
+//         {/* Month Selector */}
+//         <select
+//           className="border rounded px-4 py-2 text-black"
+//           value={selectedDate.getMonth()}
+//           onChange={(e) => setSelectedDate(new Date(selectedDate.getFullYear(), e.target.value, 1))}
+//         >
+//           {months.map((month, i) => (
+//             <option value={i} key={i}>{month}</option>
+//           ))}
+//         </select>
+
+//         {/* Year Selector */}
+//         <select
+//           className="border rounded px-4 py-2 text-black"
+//           value={selectedDate.getFullYear()}
+//           onChange={(e) => setSelectedDate(new Date(e.target.value, selectedDate.getMonth(), 1))}
+//         >
+//           {Array.from({ length: 10 }, (_, i) => selectedDate.getFullYear() - 5 + i).map((year) => (
+//             <option value={year} key={year}>{year}</option>
+//           ))}
+//         </select>
+
+//         <button
+//           className="p-2 bg-gray-200 rounded hover:bg-gray-300 text-black"
+//           onClick={() => changeMonth(1)}
+//         >
+//           &gt;
+//         </button>
+//       </div>
+
+//       {/* Days of the Week Header */}
+//       <div className="days-of-week grid grid-cols-7 gap-1 mb-4 text-center text-sm font-semibold">
+//         {daysOfWeek.map((day) => (
+//           <div key={day} className="text-gray-600">{day}</div>
+//         ))}
+//       </div>
+
+//       {/* Days of the Month */}
+//       <div className="days grid grid-cols-7 gap-1">
+//         {daysInMonth().map((day, index) => (
+//           <div key={index} className={`p-2 text-center ${day ? 'border border-gray-300 hover:bg-blue-100 cursor-pointer' : ''}`}>
+//             {day ? day.getDate() : ''}
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// }

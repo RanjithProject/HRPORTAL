@@ -1,7 +1,3 @@
-
-
-
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -89,12 +85,7 @@ export default function LoginPage() {
                 >
                     {passwordVisible ? <FaEyeSlash className="text-gray-600" /> : <FaRegEye className="text-gray-600" />}
                 </button>
-            </div>
-
-           
-        
-
-            
+            </div>   
             <button
                 onClick={onLogin}
                 className="p-2 border border-gray-300 mb-4 bg-blue-500 text-white rounded-lg w-80 hover:bg-blue-600 transition duration-200"
