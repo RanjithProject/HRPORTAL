@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('./Model/Employee');
 const config = require('./DBConfig/Config');
 const app = express();
+
 const port = 4000;
 
 app.use(cors());
@@ -31,7 +32,7 @@ app.get('/api/login-status', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const lastLogin = user.cart[user.cart.length - 1]; 
+    const lastLogin = user.worktimestamp[user.worktimestamp.length - 1]; 
     const status = lastLogin ? lastLogin.action : 'Sign Out'; 
 
     res.status(200).json({ success: true, status });
@@ -59,13 +60,13 @@ console.log("username : ",username," action : ",action," timestamp : ",timestamp
     }
 
     // Get the last action and check if it's already the same as the new action
-    const lastAction = user.cart[user.cart.length - 1];
+    const lastAction = user.worktimestamp[user.worktimestamp.length - 1];
     if (lastAction && lastAction.action === action) {
       return res.status(400).json({ error: 'Action is already the same' });
     }
 
-    // Add action to user's login history (cart)
-    user.cart.push({ action, timestamp: new Date(timestamp) });
+    // Add action to user's login history (worktimestamp)
+    user.worktimestamp.push({ action, timestamp: new Date(timestamp) });
     await user.save();
 
     res.status(200).json({ message: 'Action logged successfully' });
@@ -73,6 +74,28 @@ console.log("username : ",username," action : ",action," timestamp : ",timestamp
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+// app.patch('/api/break',async (req,res)=>{
+//   const { username, breaktimestamp } = req.body;
+//   console.log("username : ",username," breaktimestamp : ",breaktimestamp);
+  
+//   try{
+// if(!["Sign In","Sign Out"].includes(status)){
+//   return res.json({success:false,message:"Invalid Actions"});
+// }
+
+// const user=await User.findOne({username});
+
+// if(!user){
+//   return res.status(400).json({error:'User not found'});
+// }
+// //get the last action and check if it's already the same as the new action
+
+//   }catch(error){
+//     res.status(500).json({success:false,message:"Server error :",error});
+//   }
+// })
 
 
 // Get login history for a user
@@ -86,8 +109,8 @@ app.get('/api/login-history', async (req, res) => {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    // Return the user's cart (login/logout history)
-    res.status(200).json({ history: user.cart });
+    // Return the user's worktimestamp (login/logout history)
+    res.status(200).json({ history: user.worktimestamp });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -104,8 +127,8 @@ app.get('/api/current-login-status', async (req, res) => {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    // Get the last action from the cart (login history)
-    const lastAction = user.cart[user.cart.length - 1];
+    // Get the last action from the worktimestamp (login history)
+    const lastAction = user.worktimestamp[user.worktimestamp.length - 1];
     const status = lastAction ? lastAction.action : 'Sign Out'; // Default to 'Sign Out' if no history
 
     res.status(200).json({ status });

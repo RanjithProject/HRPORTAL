@@ -6,9 +6,8 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please provide a username"],
     unique: true,
   },
-  
-  // Add cart array to store login and sign-out history
-  cart: [
+  // Add worktimestamp array to store login and sign-out history
+  worktimestamp: [
     {
       action: {
         type: String,
@@ -19,8 +18,22 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
       },
+      breaktimestamp:[
+        {
+          status:{
+            type:String,
+            enum:["Break In","Sign Out"],
+            required:true,
+          },
+        timestamp:{
+          type:Date,
+          default:Date.now,
+        }
+      }
+      ]
     },
   ],
+ 
 });
 
 let User;
