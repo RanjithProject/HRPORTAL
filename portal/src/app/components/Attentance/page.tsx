@@ -1,34 +1,533 @@
-'use client';
+// // 'use client'; 
+// // import { useAppContext } from '@/app/Context';
+// // import axios from 'axios';
+// // import React, { useState, useEffect } from 'react';
+
+// // const Attendance = () => {
+// //   const { userName } = useAppContext();
+// //   const [currentDate, setCurrentDate] = useState(new Date());
+// //   const [loginOut, setLoginOut] = useState('Sign Out'); // Tracks the login state (Sign In/Sign Out)
+// //   const [breakStatus, setBreakStatus] = useState('Break Out'); // Tracks break status (Break In/Break Out)
+// //   const [loginHistory, setLoginHistory] = useState([]); // Tracks login and break history
+
+// //   // Fetch the current login status from the backend
+// //   const fetchLoginStatus = async () => {
+// //     try {
+// //       const response = await axios.get('http://localhost:4000/api/login-status', {
+// //         params: { username: userName },
+// //       });
+// //       if (response.data.success) {
+// //         setLoginOut(response.data.status);
+// //       }
+// //     } catch (error) {
+// //       console.error('Error fetching login status:', error.response?.data || error.message);
+// //     }
+// //   };
+
+// //   // Toggle login state (Sign In / Sign Out)
+// //   const toggleLoginState = async () => {
+// //     const newState = loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out';
+
+// //     // Optimistically update the UI
+// //     setLoginOut(newState);
+
+// //     try {
+// //       const response = await axios.patch('http://localhost:4000/api/login', {
+// //         action: newState,
+// //         username: userName,
+// //         timestamp: new Date().toISOString(),
+// //       });
+
+// //       console.log('Action successfully logged:', response.data);
+
+// //       // Fetch updated login status and history after logging action
+// //       fetchLoginStatus();
+// //       fetchLoginHistory();
+// //     } catch (error) {
+// //       console.error('Error logging action:', error.response?.data || error.message);
+// //       // Roll back the UI state change on failure
+// //       setLoginOut(loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out');
+// //     }
+// //   };
+
+// //   // Toggle Break In/Break Out status (only allowed when signed in)
+// //   const toggleBreakInOut = async () => {
+// //     if (loginOut !== 'Sign In') {
+// //       console.error('Cannot take a break unless signed in');
+// //       return;
+// //     }
+
+// //     const newStatus = breakStatus === 'Break Out' ? 'Break In' : 'Break Out';
+
+// //     // Optimistically update the UI
+// //     setBreakStatus(newStatus);
+
+// //     try {
+// //       const response = await axios.patch('http://localhost:4000/api/break', {
+// //         username: userName,
+// //         status: newStatus,
+// //         timestamp: new Date().toISOString(),
+// //       });
+
+// //       console.log('Break action successfully logged:', response.data);
+// //       // Fetch updated login history after logging break action
+// //       fetchLoginHistory();
+// //     } catch (error) {
+// //       console.error('Error logging break action:', error.response?.data || error.message);
+// //       // Roll back the UI state change on failure
+// //       setBreakStatus(breakStatus === 'Break In' ? 'Break Out' : 'Break In');
+// //     }
+// //   };
+
+// //   // Fetch login history from the backend
+// //   const fetchLoginHistory = async () => {
+// //     try {
+// //       const response = await axios.get('http://localhost:4000/api/login-history', {
+// //         params: { username: userName },
+// //       });
+// //       setLoginHistory(response.data.history);
+// //     } catch (error) {
+// //       console.error('Error fetching login history:', error.response?.data || error.message);
+// //     }
+// //   };
+
+// //   // Calculate time difference for the login history
+// //   const calculateTimeDifferences = (history) => {
+// //     const differences = [];
+// //     for (let i = 0; i < history.length; i += 2) {
+// //       const signIn = history[i];
+// //       const signOut = history[i + 1];
+// //       if (signIn && signOut && signIn.action === 'Sign In' && signOut.action === 'Sign Out') {
+// //         const time1 = new Date(signIn.timestamp);
+// //         const time2 = new Date(signOut.timestamp);
+
+// //         // Calculate the difference in milliseconds
+// //         const differenceInMilliseconds = time2 - time1;
+
+// //         // Convert milliseconds to hours, minutes, seconds, and milliseconds
+// //         const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
+// //         const minutes = Math.floor((differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+// //         const seconds = Math.floor((differenceInMilliseconds % (1000 * 60)) / 1000);
+// //         const milliseconds = differenceInMilliseconds % 1000;
+
+// //         differences.push({ hours, minutes, seconds, milliseconds });
+// //       }
+// //     }
+// //     return differences;
+// //   };
+
+// //   const timeDifferences = calculateTimeDifferences(loginHistory);
+
+// //   // Format time with leading zeros for display
+// //   const formatTime = (time) => (time < 10 ? `0${time}` : time);
+// //   const formatMilliseconds = (ms) => ms.toString().padStart(3, '0');
+
+// //   useEffect(() => {
+// //     // Update the date and time every 1000ms (1 second)
+// //     const intervalId = setInterval(() => {
+// //       setCurrentDate(new Date());
+// //     }, 1000);
+
+// //     // Fetch initial login status and login history on component mount
+// //     fetchLoginStatus();
+// //     fetchLoginHistory();
+
+// //     // Cleanup interval on component unmount
+// //     return () => clearInterval(intervalId);
+// //   }, [userName]);
+
+// //   return (
+// //     <div className="p-4">
+// //       <h1 className="text-xl font-bold mb-4">Current Date and Time</h1>
+
+// //       {/* Display Current Date */}
+// //       <div className="mb-2">
+// //         <p><strong>Year:</strong> {currentDate.getFullYear()}</p>
+// //         <p><strong>Month:</strong> {currentDate.getMonth() + 1}</p>
+// //         <p><strong>Day:</strong> {currentDate.getDate()}</p>
+// //       </div>
+
+// //       {/* Display Current Time */}
+// //       <div className="mb-4">
+// //         <p>
+// //           <strong>Time:</strong> {formatTime(currentDate.getHours())}:
+// //           {formatTime(currentDate.getMinutes())}:{formatTime(currentDate.getSeconds())}.
+// //           {formatMilliseconds(currentDate.getMilliseconds())}
+// //         </p>
+// //       </div>
+
+// //       {/* Display Average Working Hours */}
+// //       <div className="mb-4">
+// //         <h2>Average working hours: 8:00</h2>
+// //       </div>
+
+// //       {/* Toggle Sign In/Sign Out Button */}
+// //       <div>
+// //         <button
+// //           onClick={toggleLoginState}
+// //           className={`text-white px-4 py-2 rounded-lg 
+// //             ${loginOut === 'Sign In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+// //         >
+// //           {loginOut === 'Sign In' ? 'Sign Out' : 'Sign In'}
+// //         </button>
+// //       </div>
+
+// //       {/* Toggle Break In/Break Out Button */}
+// //       <div>
+// //         <button
+// //           onClick={toggleBreakInOut}
+// //           className={`text-white px-4 py-2 rounded-lg 
+// //             ${breakStatus === 'Break In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+// //           disabled={loginOut !== 'Sign In'} // Disable if user is not signed in
+// //         >
+// //           {breakStatus === 'Break In' ? 'Break Out' : 'Break In'}
+// //         </button>
+// //       </div>
+
+// //       {/* Display Login History */}
+// //       <div className="mt-4">
+// //         <h3>Login History:</h3>
+// //         <ul>
+// //           {loginHistory.map((entry, index) => (
+// //             <li key={entry._id}>
+// //               {entry.action} - {new Date(entry.timestamp).toLocaleString()}
+// //             </li>
+// //           ))}
+// //         </ul>
+// //       </div>
+
+// //       {/* Display Time Differences for Each Session */}
+// //       <div className="mt-4">
+// //         <h3>Time Differences:</h3>
+// //         <ul>
+// //           {timeDifferences.map((diff, index) => (
+// //             <li key={index}>
+// //               {diff.hours} hours, {diff.minutes} minutes, {diff.seconds} seconds, {diff.milliseconds} milliseconds
+// //             </li>
+// //           ))}
+// //         </ul>
+// //       </div>
+// //     </div>
+// //   );
+// // };
+
+// // export default Attendance;
+
+
+
+
+
+
+
+
+// 'use client'; 
+// import { useAppContext } from '@/app/Context';
+// import axios from 'axios';
+// import React, { useState, useEffect } from 'react';
+
+// const Attendance = () => {
+//   const { userName } = useAppContext();
+//   const [currentDate, setCurrentDate] = useState(new Date());
+//   const [loginOut, setLoginOut] = useState('Sign Out'); // Tracks the login state (Sign In/Sign Out)
+//   const [breakStatus, setBreakStatus] = useState('Break Out'); // Tracks break status (Break In/Break Out)
+//   const [loginHistory, setLoginHistory] = useState([]); // Tracks login and break history
+
+//   // Fetch the current login status from the backend
+//   const fetchLoginStatus = async () => {
+//     try {
+//       const response = await axios.get('http://localhost:4000/api/login-status', {
+//         params: { username: userName },
+//       });
+//       if (response.data.success) {
+//         setLoginOut(response.data.status);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching login status:', error.response?.data || error.message);
+//     }
+//   };
+
+//   // Fetch current Break In/Break Out status from the backend
+//   const fetchBreakStatus = async () => {
+//     try {
+//       const response = await axios.get('http://localhost:4000/api/break-status', {
+//         params: { username: userName },
+//       });
+//       if (response.data.success) {
+//         setBreakStatus(response.data.status); // Set break status from backend
+//       }
+//     } catch (error) {
+//       console.error('Error fetching break status:', error.response?.data || error.message);
+//     }
+//   };
+
+//   // Toggle login state (Sign In / Sign Out)
+//   const toggleLoginState = async () => {
+//     const newState = loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out';
+
+//     // Optimistically update the UI
+//     setLoginOut(newState);
+
+//     try {
+//       const response = await axios.patch('http://localhost:4000/api/login', {
+//         action: newState,
+//         username: userName,
+//         timestamp: new Date().toISOString(),
+//       });
+
+//       console.log('Action successfully logged:', response.data);
+
+//       // Fetch updated login status and history after logging action
+//       fetchLoginStatus();
+//       fetchLoginHistory();
+//     } catch (error) {
+//       console.error('Error logging action:', error.response?.data || error.message);
+//       // Roll back the UI state change on failure
+//       setLoginOut(loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out');
+//     }
+//   };
+
+//   // Toggle Break In/Break Out status (only allowed when signed in)
+//   const toggleBreakInOut = async () => {
+//     if (loginOut !== 'Sign In') {
+//       console.error('Cannot take a break unless signed in');
+//       return;
+//     }
+
+//     const newStatus = breakStatus === 'Break Out' ? 'Break In' : 'Break Out';
+
+//     // Optimistically update the UI
+//     setBreakStatus(newStatus);
+
+//     try {
+//       const response = await axios.patch('http://localhost:4000/api/break', {
+//         username: userName,
+//         status: newStatus,
+//         timestamp: new Date().toISOString(),
+//       });
+
+//       console.log('Break action successfully logged:', response.data);
+//       // Fetch updated break status and login history after logging break action
+//       fetchBreakStatus();
+//       fetchLoginHistory();
+//     } catch (error) {
+//       console.error('Error logging break action:', error.response?.data || error.message);
+//       // Roll back the UI state change on failure
+//       setBreakStatus(breakStatus === 'Break In' ? 'Break Out' : 'Break In');
+//     }
+//   };
+
+//   // Fetch login history from the backend
+//   const fetchLoginHistory = async () => {
+//     try {
+//       const response = await axios.get('http://localhost:4000/api/login-history', {
+//         params: { username: userName },
+//       });
+//       setLoginHistory(response.data.history);
+//     } catch (error) {
+//       console.error('Error fetching login history:', error.response?.data || error.message);
+//     }
+//   };
+
+//   // Calculate time difference for the login history
+//   const calculateTimeDifferences = (history) => {
+//     const differences = [];
+//     for (let i = 0; i < history.length; i += 2) {
+//       const signIn = history[i];
+//       const signOut = history[i + 1];
+//       if (signIn && signOut && signIn.action === 'Sign In' && signOut.action === 'Sign Out') {
+//         const time1 = new Date(signIn.timestamp);
+//         const time2 = new Date(signOut.timestamp);
+
+//         // Calculate the difference in milliseconds
+//         const differenceInMilliseconds = time2 - time1;
+
+//         // Convert milliseconds to hours, minutes, seconds, and milliseconds
+//         const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
+//         const minutes = Math.floor((differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+//         const seconds = Math.floor((differenceInMilliseconds % (1000 * 60)) / 1000);
+//         const milliseconds = differenceInMilliseconds % 1000;
+
+//         differences.push({ hours, minutes, seconds, milliseconds });
+//       }
+//     }
+//     return differences;
+//   };
+
+//   const timeDifferences = calculateTimeDifferences(loginHistory);
+
+//   // Format time with leading zeros for display
+//   const formatTime = (time) => (time < 10 ? `0${time}` : time);
+//   const formatMilliseconds = (ms) => ms.toString().padStart(3, '0');
+
+//   useEffect(() => {
+//     // Update the date and time every 1000ms (1 second)
+//     const intervalId = setInterval(() => {
+//       setCurrentDate(new Date());
+//     }, 1000);
+
+//     // Fetch initial login status, break status, and login history on component mount
+//     fetchLoginStatus();
+//     fetchBreakStatus(); // Added fetching break status here
+//     fetchLoginHistory();
+
+//     // Cleanup interval on component unmount
+//     return () => clearInterval(intervalId);
+//   }, [userName]);
+
+//   return (
+//     <div className="p-4">
+//       <h1 className="text-xl font-bold mb-4">Current Date and Time</h1>
+
+//       {/* Display Current Date */}
+//       <div className="mb-2">
+//         <p><strong>Year:</strong> {currentDate.getFullYear()}</p>
+//         <p><strong>Month:</strong> {currentDate.getMonth() + 1}</p>
+//         <p><strong>Day:</strong> {currentDate.getDate()}</p>
+//       </div>
+
+//       {/* Display Current Time */}
+//       <div className="mb-4">
+//         <p>
+//           <strong>Time:</strong> {formatTime(currentDate.getHours())}:
+//           {formatTime(currentDate.getMinutes())}:{formatTime(currentDate.getSeconds())}.
+//           {formatMilliseconds(currentDate.getMilliseconds())}
+//         </p>
+//       </div>
+
+//       {/* Display Average Working Hours */}
+//       <div className="mb-4">
+//         <h2>Average working hours: 8:00</h2>
+//       </div>
+
+//       {/* Toggle Sign In/Sign Out Button */}
+//       <div>
+//         <button
+//           onClick={toggleLoginState}
+//           className={`text-white px-4 py-2 rounded-lg 
+//             ${loginOut === 'Sign In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+//         >
+//           {loginOut === 'Sign In' ? 'Sign Out' : 'Sign In'}
+//         </button>
+//       </div>
+
+//       {/* Toggle Break In/Break Out Button */}
+//       <div>
+//         <button
+//           onClick={toggleBreakInOut}
+//           className={`text-white px-4 py-2 rounded-lg 
+//             ${breakStatus === 'Break In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+//           disabled={loginOut !== 'Sign In'} // Disable if user is not signed in
+//         >
+//           {breakStatus === 'Break In' ? 'Break Out' : 'Break In'}
+//         </button>
+//       </div>
+
+//       {/* Display Login History */}
+//       <div className="mt-4">
+//         <h3>Login History:</h3>
+//         <ul>
+//           {loginHistory.map((entry, index) => (
+//             <li key={entry._id}>
+//               {entry.action} - {new Date(entry.timestamp).toLocaleString()}
+//             </li>
+//           ))}
+//         </ul>
+//       </div>
+
+//       {/* Display Time Differences for Each Session */}
+//       <div className="mt-4">
+//         <h3>Time Differences:</h3>
+//         <ul>
+//           {timeDifferences.map((diff, index) => (
+//             <li key={index}>
+//               {diff.hours} hours, {diff.minutes} minutes, {diff.seconds} seconds, {diff.milliseconds} milliseconds
+//             </li>
+//           ))}
+//         </ul>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Attendance;
+
+
+
+
+
+
+
+
+
+'use client'; 
 import { useAppContext } from '@/app/Context';
 import axios from 'axios';
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
 const Attendance = () => {
   const { userName } = useAppContext();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [loginOut, setLoginOut] = useState('Sign Out');
-  // const [BreakinOut,setBreakinOut]=useState("Break Out");
+  const [breakStatus, setBreakStatus] = useState('Break Out');
   const [loginHistory, setLoginHistory] = useState([]);
+  const [totalBreakTime, setTotalBreakTime] = useState(0); // Tracks total break time in milliseconds
 
-  // Fetch the current login status from the backend
-  const fetchLoginStatus = async () => {
+  // Fetch login and break history from the backend
+  const fetchLoginHistory = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/login-status', {
+      const response = await axios.get('http://localhost:4000/api/login-history', {
         params: { username: userName },
       });
-      if (response.data.success) {
-        setLoginOut(response.data.status);
-      }
+
+      const history = response.data.history.flatMap(entry => {
+        const historyItem = [{ action: entry.action, timestamp: entry.timestamp }];
+        
+        if (entry.breaktimestamp && entry.breaktimestamp.length > 0) {
+          entry.breaktimestamp.forEach(breakEntry => {
+            historyItem.push({
+              action: breakEntry.status,
+              timestamp: breakEntry.timestamp,
+              type: 'break'
+            });
+          });
+        }
+
+        return historyItem;
+      });
+
+      setLoginHistory(history);
+      calculateTotalBreakTime(response.data.history);
     } catch (error) {
-      console.error('Error fetching login status:', error.response?.data || error.message);
+      console.error('Error fetching login history:', error.response?.data || error.message);
     }
+  };
+
+  // Calculate total break time in hours, minutes, and seconds
+  const calculateTotalBreakTime = (history) => {
+    let breakTime = 0;
+    history.forEach(entry => {
+      if (entry.breaktimestamp) {
+        entry.breaktimestamp.forEach((breakEntry, index) => {
+          const breakIn = new Date(breakEntry.timestamp);
+          const breakOut = entry.breaktimestamp[index + 1] && entry.breaktimestamp[index + 1].status === 'Break Out' 
+                            ? new Date(entry.breaktimestamp[index + 1].timestamp)
+                            : null;
+
+          if (breakOut) {
+            breakTime += breakOut - breakIn; // Add the break duration in milliseconds
+          }
+        });
+      }
+    });
+
+    setTotalBreakTime(breakTime);
   };
 
   // Toggle login state (Sign In / Sign Out)
   const toggleLoginState = async () => {
     const newState = loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out';
 
-    // Optimistically update the UI
     setLoginOut(newState);
 
     try {
@@ -38,101 +537,120 @@ const Attendance = () => {
         timestamp: new Date().toISOString(),
       });
 
-      console.log('Action successfully logged:', response.data);
-
-      // Fetch updated login status and history after logging action
-      fetchLoginStatus();
       fetchLoginHistory();
     } catch (error) {
       console.error('Error logging action:', error.response?.data || error.message);
-      // Roll back the UI state change on failure
       setLoginOut(loginOut === 'Sign Out' ? 'Sign In' : 'Sign Out');
     }
   };
 
+  // Toggle Break In/Break Out status
+  const toggleBreakInOut = async () => {
+    if (loginOut !== 'Sign In') {
+      console.error('Cannot take a break unless signed in');
+      return;
+    }
 
-// const toggleBreakInOut=async()=>{
-//   const newState=BreakinOut=='Break Out'?'Break In':'Break Out';
+    const newStatus = breakStatus === 'Break Out' ? 'Break In' : 'Break Out';
+    setBreakStatus(newStatus);
 
-//   //auto update
-//   setBreakinOut(newState);
-
-//   try{
-//     const response=await axios.patch('http://localhost:4000/api/break',{
-//       act
-//     })
-//   }catch(error){
-//     console.log(error);
-    
-//   }
-
-// }
-
-  // Fetch login history from the backend
-  
-  const fetchLoginHistory = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/login-history', {
-        params: { username: userName },
+      const response = await axios.patch('http://localhost:4000/api/break', {
+        username: userName,
+        status: newStatus,
+        timestamp: new Date().toISOString(),
       });
-      setLoginHistory(response.data.history);
+
+      fetchLoginHistory();
     } catch (error) {
-      console.error('Error fetching login history:', error.response?.data || error.message);
+      console.error('Error logging break action:', error.response?.data || error.message);
+      setBreakStatus(breakStatus === 'Break In' ? 'Break Out' : 'Break In');
     }
   };
 
+  // Calculate duration between Sign In and Sign Out
+  const calculateSignInSignOutDuration = (signInTimestamp, signOutTimestamp) => {
+    const signIn = new Date(signInTimestamp);
+    const signOut = new Date(signOutTimestamp);
+    const diffInMilliseconds = signOut - signIn;
+
+    const hours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    const minutes = Math.floor((diffInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diffInMilliseconds % (1000 * 60)) / 1000);
+
+    return { hours, minutes, seconds };
+  };
+
+  // Format time with leading zeros for display
+  const formatTime = (time) => (time < 10 ? `0${time}` : time);
+
   useEffect(() => {
-    // Update the date and time every 1000ms (1 second)
     const intervalId = setInterval(() => {
       setCurrentDate(new Date());
     }, 1000);
 
-    // Fetch initial login status and login history on component mount
-    fetchLoginStatus();
     fetchLoginHistory();
 
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, [userName]);
 
-  // Calculate time difference between each "Sign In" and "Sign Out" pair
-  const calculateTimeDifferences = (history) => {
-    const differences = [];
-    for (let i = 0; i < history.length; i += 2) {
-      const signIn = history[i];
-      const signOut = history[i + 1];
-      if (signIn && signOut && signIn.action === "Sign In" && signOut.action === "Sign Out") {
-        const time1 = new Date(signIn.timestamp);
-        const time2 = new Date(signOut.timestamp);
+  // Format Break History Table
+  const renderBreakHistory = () => {
+    const breakEntries = [];
 
-        // Calculate the difference in milliseconds
-        const differenceInMilliseconds = time2 - time1;
+    loginHistory.forEach((entry, index) => {
+      if (entry.type === 'break' && entry.action === 'Break Out') {
+        // Find the corresponding "Break In" for this "Break Out"
+        const breakInEntry = loginHistory.slice(0, index).reverse().find(e => e.type === 'break' && e.action === 'Break In');
+        
+        if (breakInEntry) {
+          const breakIn = new Date(breakInEntry.timestamp);
+          const breakOut = new Date(entry.timestamp);
+          const breakDuration = breakOut - breakIn; // in milliseconds
 
+          const breakDurationHours = Math.floor(breakDuration / (1000 * 60 * 60));
+          const breakDurationMinutes = Math.floor((breakDuration % (1000 * 60 * 60)) / (1000 * 60));
+          const breakDurationSeconds = Math.floor((breakDuration % (1000 * 60)) / 1000);
 
-
-        // Convert milliseconds to hours, minutes, seconds, and milliseconds
-        const hours = Math.floor(differenceInMilliseconds / (1000 * 60 * 60));
-        const minutes = Math.floor((differenceInMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((differenceInMilliseconds % (1000 * 60)) / 1000);
-        const milliseconds = differenceInMilliseconds % 1000;
-
-        differences.push({ hours, minutes, seconds, milliseconds });
+          breakEntries.push({
+            breakIn: breakIn.toLocaleString(),
+            breakOut: breakOut.toLocaleString(),
+            breakDuration: `${breakDurationHours} hours ${breakDurationMinutes} minutes ${breakDurationSeconds} seconds`
+          });
+        }
       }
-    }
-    return differences;
+    });
+
+    return breakEntries;
   };
 
-  const timeDifferences = calculateTimeDifferences(loginHistory);
+  // Format Login History for Sign In/Sign Out table
+  const renderLoginHistory = () => {
+    const loginEntries = [];
 
+    loginHistory.forEach((entry, index) => {
+      if (entry.action === 'Sign In' || entry.action === 'Sign Out') {
+        const timestamp = new Date(entry.timestamp).toLocaleString();
 
+        if (entry.action === 'Sign In') {
+          loginEntries.push({ signIn: timestamp, signOut: null, duration: null });
+        } else if (entry.action === 'Sign Out') {
+          const lastSignIn = loginEntries.find(e => e.signOut === null);
+          if (lastSignIn) {
+            lastSignIn.signOut = timestamp;
+            const duration = calculateSignInSignOutDuration(lastSignIn.signIn, lastSignIn.signOut);
+            lastSignIn.duration = `${formatTime(duration.hours)}:${formatTime(duration.minutes)}:${formatTime(duration.seconds)}`;
+          }
+        }
+      }
+    });
 
-  // Format time with leading zeros for display
-  const formatTime = (time) => (time < 10 ? `0${time}` : time);
-  const formatMilliseconds = (ms) => ms.toString().padStart(3, '0');
+    return loginEntries;
+  };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Current Date and Time</h1>
+    <div className="p-6 space-y-4">
+      <h1 className="text-2xl font-semibold mb-4">Current Date and Time</h1>
 
       {/* Display Current Date */}
       <div className="mb-2">
@@ -145,14 +663,8 @@ const Attendance = () => {
       <div className="mb-4">
         <p>
           <strong>Time:</strong> {formatTime(currentDate.getHours())}:
-          {formatTime(currentDate.getMinutes())}:{formatTime(currentDate.getSeconds())}.
-          {formatMilliseconds(currentDate.getMilliseconds())}
+          {formatTime(currentDate.getMinutes())}:{formatTime(currentDate.getSeconds())}
         </p>
-      </div>
-
-      {/* Display Average Working Hours */}
-      <div className="mb-4">
-        <h2>Average working hours: 8:00</h2>
       </div>
 
       {/* Toggle Sign In/Sign Out Button */}
@@ -166,47 +678,78 @@ const Attendance = () => {
         </button>
       </div>
 
-
-            {/* Toggle Break In/Break Out Button
-            <div>
+      {/* Toggle Break In/Break Out Button */}
+      <div>
         <button
           onClick={toggleBreakInOut}
           className={`text-white px-4 py-2 rounded-lg 
-            ${loginOut === 'Break In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+            ${breakStatus === 'Break In' ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'}`}
+          disabled={loginOut !== 'Sign In'}
         >
-          {loginOut === 'Break In' ? 'Break Out' : 'Break In'}
+          {breakStatus === 'Break In' ? 'Break Out' : 'Break In'}
         </button>
-      </div> */}
 
-      {/* Display Login History */}
-      <div className="mt-4">
-        <h3>Login History:</h3>
-        <ul>
-          {loginHistory.map((entry, index) => (
-            <li key={entry._id}>
-              {entry.action} - {new Date(entry.timestamp).toLocaleString()}
-            </li>
-          ))}
-        </ul>
+        <Link href={'/components/LeaveApplyPage'} className='text-white px-4 py-2 rounded-lg bg-black'>Leave Apply</Link>
       </div>
 
+      {/* Display Sign In and Sign Out History */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold">Sign In/Sign Out History:</h3>
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2">Sign In</th>
+              <th className="border px-4 py-2">Sign Out</th>
+              <th className="border px-4 py-2">Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderLoginHistory().map((entry, index) => (
+              <tr key={index}>
+                <td className="border px-4 py-2">{entry.signIn}</td>
+                <td className="border px-4 py-2">{entry.signOut || '-'}</td>
+                <td className="border px-4 py-2">{entry.duration || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
+      {/* Display Break History Table */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold">Break History:</h3>
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2">Break In</th>
+              <th className="border px-4 py-2">Break Out</th>
+              <th className="border px-4 py-2">Break Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderBreakHistory().map((entry, index) => (
+              <tr key={index}>
+                <td className="border px-4 py-2">{entry.breakIn}</td>
+                <td className="border px-4 py-2">{entry.breakOut || '-'}</td>
+                <td className="border px-4 py-2">{entry.breakDuration}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Display Time Differences for Each Session */}
-      <div className="mt-4">
-        <h3>Time Differences:</h3>
-        <ul>
-          {timeDifferences.map((diff, index) => (
-            <li key={index}>
-              {diff.hours} hours, {diff.minutes} minutes, {diff.seconds} seconds, {diff.milliseconds} milliseconds
-            </li>
-          ))}
-        </ul>
+      {/* Display Total Break Time */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold">Total Break Time:</h3>
+        <p>
+          Total Break Time: {Math.floor(totalBreakTime / (1000 * 60 * 60))} hours 
+          {Math.floor((totalBreakTime % (1000 * 60 * 60)) / (1000 * 60))} minutes 
+          {Math.floor((totalBreakTime % (1000 * 60)) / 1000)} seconds
+        </p>
       </div>
     </div>
   );
 };
 
 export default Attendance;
-
 

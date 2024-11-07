@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    const protectedPaths = ['/', '/profile'];
+    const protectedPaths = ['/', '/profile','/components/Attentance'];
     if (protectedPaths.includes(path) && !isAuthenticated) {
         return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/',
-   
+        '/components/Attentance',
         '/profile',
         '/login',
         '/signup',
