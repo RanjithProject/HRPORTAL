@@ -1,56 +1,3 @@
-// import { connect } from "@/dbConfig/dbConfig";
-// import User from "@/models/userModel";
-// import { NextRequest, NextResponse } from "next/server";
-// import bcryptjs from "bcryptjs";
-// import { sendEmail } from "@/helpers/mailer";
-
-// export async function POST(request: NextRequest) {
-//     // const { tenantId } = request.json();
-//     // await connect(tenantId); 
-//     connect();
-//     try {
-//         const reqBody = await request.json();
-//         const { username, email, password } = reqBody;
-
-
- 
-
-   
-//         // Check if user already exists
-//         const user = await User.findOne({ email });
-
-//         if (user) {
-//             return NextResponse.json(
-//                 { error: "User already exists" },
-//                 { status: 400 }
-//             );
-//         }
-
-//         // Hash password
-//         const salt = await bcryptjs.genSalt(10);
-//         const hashedPassword = await bcryptjs.hash(password, salt);
-
-//         const newUser = new User({
-//             username,
-//             email,
-//             password: hashedPassword,
-//         });
-
-//         await newUser.save();
-//         // await sendEmail({ email, emailType: "VERIFY", userId: savedUser._id });
-
-//         return NextResponse.json(
-//             { message: "User created successfully" },
-//             { status: 201 }
-//         );
-//     } catch (error: any) {
-//         return NextResponse.json({ error: error.message }, { status: 500 });
-//     }
-// }
-
-
-
-
 import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
@@ -63,16 +10,25 @@ export async function POST(request: NextRequest) {
 
         // Parse the JSON request body
         const reqBody = await request.json();
-        const { username, email, password } = reqBody;
+        const { username, email, password,employeeId } = reqBody;
+console.log(username, email, password,employeeId );
 
         // Basic validation for the required fields
-        if (!username || !email || !password) {
+        if (!username || !email || !password||!employeeId) {
             return NextResponse.json(
-                { error: "Username, email, and password are required." },
+                { error: "Username, email,employeeId and password are required." },
                 { status: 400 }
             );
         }
+        //check if the id already exists
+        const existingEmployeeId=await User.findOne({employeeId});
 
+        if(existingEmployeeId){
+            return NextResponse.json(
+                {error:"Emaployee Id is Already Exists"},
+                {status:400}
+            )
+        }
         // Check if the user already exists
         const existingUser = await User.findOne({ email });
 
@@ -83,6 +39,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
+
+
         // Hash the password using bcrypt
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
@@ -92,6 +50,7 @@ export async function POST(request: NextRequest) {
             username,
             email,
             password: hashedPassword,
+            employeeId
         });
 
         // Save the new user to the database

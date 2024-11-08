@@ -8,17 +8,23 @@ const AppContext = createContext(null);
 // Context Provider component
 export function AppWrapper({ children }) {
   const [userName, setUserName] = useState(null);
+  const [employeeId,setEmployeeId]=useState(null);
 
   // Fetch user details
   const fetchUserDetails = async () => {
     try {
       const res = await axios.get('/api/users/me');
       setUserName(res.data.data.username); 
+      setEmployeeId(res.data.data.employeeId);
     } catch (error) {
       console.error(error.message);
       setUserName(null); // Set to null if user is not logged in
     }
   };
+console.log(userName);
+
+console.log(employeeId);
+
 
   // Update the user details by calling the fetch function
   const updateUserDetails = () => {
@@ -31,7 +37,7 @@ export function AppWrapper({ children }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ userName, updateUserDetails }}>
+    <AppContext.Provider value={{employeeId, userName, updateUserDetails }}>
       {children}
     </AppContext.Provider>
   );

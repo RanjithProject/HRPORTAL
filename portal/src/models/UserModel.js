@@ -45,12 +45,18 @@
 
 import mongoose from "mongoose";
 
+
 // Define the user schema
 const userSchema = new mongoose.Schema({
+    employeeId:{
+        type:String,
+        require:[true,"Please Provide a Employee Id"],
+        unique:true,
+    },
     username: {
         type: String,
         required: [true, "Please provide a username"],
-        unique: true,
+      
     },
     email: {
         type: String,
@@ -78,10 +84,10 @@ const userSchema = new mongoose.Schema({
 
 // Create and export the User model, checking if it already exists
 let User;
-if (mongoose.modelNames().includes("users")) {
-    User = mongoose.model("users");
+if (mongoose.modelNames().includes("Employee")) {
+    User = mongoose.model("Employee");
 } else {
-    User = mongoose.model("users", userSchema);
+    User = mongoose.model("Employee", userSchema);
 }
 
 export default User;

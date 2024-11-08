@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [user, setUser] = useState({
         email: "",
         password: "",
-     
+        employeeId:""
     });
     
     const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -58,6 +58,17 @@ export default function LoginPage() {
             <h1 className="text-2xl font-bold mb-4">{loading ? "Processing" : "Login"}</h1>
             <hr className="w-full mb-4" />
             
+
+            <label htmlFor="email" className="mb-1">Employee Id : </label>
+            <input
+                className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-600 text-black mb-4 w-80"
+                id="Employee Id"
+                type="text"
+                value={user.employeeId}
+                onChange={(e) => setUser({ ...user, employeeId: e.target.value })}
+                placeholder="Email"
+            />
+
             <label htmlFor="email" className="mb-1">Email</label>
             <input
                 className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-600 text-black mb-4 w-80"

@@ -11,6 +11,7 @@ export default function SignupPage() {
     const router = useRouter();
     const [user, setUser] = useState({
         email: "",
+        employeeId:"",
         username: "",
         password: "",
     });
@@ -33,6 +34,7 @@ export default function SignupPage() {
             }
         } catch (error) {
             console.log(error);
+            alert(error.response.data.error);
           
         } finally {
             setLoading(false);
@@ -47,7 +49,13 @@ export default function SignupPage() {
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-gray-100">
             <h1 className="text-2xl font-bold mb-4">{loading ? "Processing" : "Sign Up"}</h1>
             <hr className="w-full mb-4" />
-
+            <label htmlFor="employeeId" className="mb-1">EmployeeId</label>
+<input 
+  className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-600 text-black mb-4 w-80"
+  onChange={(e)=>setUser({...user,employeeId:e.target.value})}
+  placeholder="Employee Id"
+type="number" 
+/>
             <label htmlFor="username" className="mb-1">Username</label>
             <input
                 className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-gray-600 text-black mb-4 w-80"

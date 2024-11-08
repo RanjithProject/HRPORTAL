@@ -5,7 +5,7 @@ const User = require('./Model/Employee');
 const config = require('./DBConfig/Config');
 const app = express();
 const port = 4000;
-
+const moment=require('moment');
 app.use(cors());
 app.use(express.json());
 
@@ -21,6 +21,81 @@ app.get('/', async (req, res) => {
   }
 });
 
+
+
+
+app.get('/api/todayLeaveApplications', async (req, res) => {
+  try {
+    // Get today's date
+    const getCurrentDate = () => moment().format('YYYY-MM-DD'); 
+    const currentDate = getCurrentDate();  // 2024-11-08, for example
+
+    // Query to find all employees who have leave applied today (matching appliedAt date)
+    const employeesWithTodaysLeave = await User.find({
+      'leave.appliedAt': {
+        $gte: new Date(`${currentDate}T00:00:00.000Z`),  // Start of today
+        $lt: new Date(`${currentDate}T23:59:59.999Z`)   // End of today
+      }
+    });
+
+    // If no employees have applied leave today, return a message
+    if (employeesWithTodaysLeave.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No leave applications for today.',
+        data: []
+      });
+    }
+
+    // Filter employees who have leave applied today and return their details
+    const todaysLeaveApplications = employeesWithTodaysLeave.map(employee => {
+      // Filter the employee's leave records to only include those applied today
+      const todaysLeaves = employee.leave.filter(leave => {
+        const appliedAtDate = moment(leave.appliedAt).format('YYYY-MM-DD');
+        return appliedAtDate === currentDate;
+      });
+
+      // Return employee details along with their leave records for today
+      return {
+        employeeId: employee.employeeId,
+        username: employee.username,
+        email: employee.email,
+        todaysLeaves
+      };
+    });
+
+    // Send the filtered leave applications as a response
+    res.status(200).json({
+      success: true,
+      message: 'Successfully fetched today\'s leave applications.',
+      data: todaysLeaveApplications
+    });
+  } catch (error) {
+    console.error('Error fetching today\'s leave applications:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error.',
+      error: error.message
+    });
+  }
+});
+
+
+
+
+
+app.get('/api/getAllEmployees',async(req,res)=>{
+  try{
+    const allEmployee=await User.find({});
+    if(!allEmployee){
+      res.json({message:"not found"});
+    }
+    res.json({success:true,message:"get all values",data:allEmployee});
+  }catch(error){
+    res.json({success:false,message:"server error",error});
+  }
+})
+
 // Middleware to check if the user exists
 const checkUserExists = async (req, res, next) => {
   const { username } = req.body;
@@ -35,6 +110,62 @@ const checkUserExists = async (req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+
+// Update the leave status (approved/rejected)
+app.patch('/api/updateLeaveStatus/:employeeId/:leaveId', async (req, res) => {
+  const { employeeId, leaveId } = req.params;
+  const { leaveStatus } = req.body; // The new leave status (approved, rejected)
+
+  // Validate leaveStatus
+  if (!['approved', 'rejected'].includes(leaveStatus)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid leave status. It must be "approved" or "rejected".'
+    });
+  }
+
+  try {
+    // Find the employee by employeeId
+    const employee = await User.findOne({ employeeId });
+    
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: 'Employee not found.'
+      });
+    }
+
+    // Find the leave application in the employee's leave array
+    const leaveIndex = employee.leave.findIndex(leave => leave._id.toString() === leaveId);
+
+    if (leaveIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Leave application not found.'
+      });
+    }
+
+    // Update the leave status
+    employee.leave[leaveIndex].leaveStatus = leaveStatus;
+    await employee.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Leave status updated to ${leaveStatus}`,
+      data: employee.leave[leaveIndex]
+    });
+  } catch (error) {
+    console.error('Error updating leave status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error, unable to update leave status.',
+      error: error.message
+    });
+  }
+});
+
+
 
 // Get the current login status of a user
 app.get('/api/login-status', async (req, res) => {
@@ -169,29 +300,33 @@ app.get('/api/login-history', async (req, res) => {
   }
 });
 
+
+
 app.post('/api/leave/request', async (req, res) => {
   try {
     // Extract leave request data from the request body
-    const { userId, leaveType, fromDate, toDate, reason } = req.body;
+    const {name, employeeId, leaveType, fromDate, toDate, reason } = req.body;
 
     // Validate input fields
-    if (!userId || !leaveType || !fromDate || !toDate || !reason) {
+    if (!name||!employeeId || !leaveType || !fromDate || !toDate || !reason) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
-    // Create a new leave request for the user (employee)
+    // Create a new leave request object
     const leaveRequest = {
+      employeeId,
+      name,
       leaveType,
       fromDate,
       toDate,
       reason,
-      leaveStatus: 'pending',  // Default status is pending
+      leaveStatus: 'pending', 
     };
 
-    // Find the employee by their ID
-    const user = await User.findById(userId);
+    // Find the employee by their employeeId
+    const user = await User.findOne({ employeeId });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Employee not found' });
     }
 
     // Add leave request to the employee's leave array
@@ -214,8 +349,8 @@ app.post('/api/leave/request', async (req, res) => {
 
 app.put('/leave/approve/:leaveRequestId', async (req, res) => {
   try {
-    const { leaveRequestId } = req.params;
-    const { status, adminComments, approvedBy } = req.body;  // Expected status: 'approved' or 'rejected'
+    // const { leaveRequestId } = req.params;
+    const { status, adminComments, approvedBy ,leaveRequestId} = req.body;  // Expected status: 'approved' or 'rejected'
 
     // Validate input fields
     if (!status || !['approved', 'rejected'].includes(status)) {
